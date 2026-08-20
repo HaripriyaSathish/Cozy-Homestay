@@ -1,5 +1,24 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+
+
+def video_storage():
+    """
+    Video uploads need Cloudinary's "video" resource type, not "image" -
+    the default storage (STORAGES["default"]) is image-typed, and Cloudinary
+    rejects video files uploaded that way with "Invalid image file". Falls
+    back to the regular default storage (local disk) when Cloudinary isn't
+    configured.
+    """
+    if getattr(settings, "CLOUDINARY_STORAGE", None):
+        from cloudinary_storage.storage import VideoMediaCloudinaryStorage
+
+        return VideoMediaCloudinaryStorage()
+    return default_storage
 
 
 class SingletonModel(models.Model):
@@ -62,7 +81,10 @@ class HeroContent(SingletonModel):
         help_text="Comma separated words animated in the hero (e.g. Comfort,Calm,Connection)",
     )
     hero_image = models.ImageField(upload_to="hero/", blank=True, null=True)
-    hero_video = models.FileField(upload_to="hero/", blank=True, null=True, help_text="Optional short background video")
+    hero_video = models.FileField(
+    upload_to="hero/", blank=True, null=True, storage=video_storage,
+    help_text="Optional short background video",
+    )
     badge_text = models.CharField(max_length=100, blank=True, default="Handpicked Boutique Stay")
 
     class Meta:
@@ -178,7 +200,7 @@ class PropertyImage(models.Model):
 
 class FeaturedVideo(SingletonModel):
     title = models.CharField(max_length=150, default="A Glimpse of Your Next Escape.")
-    video_file = models.FileField(upload_to="video/", blank=True, null=True)
+    video_file = models.FileField(upload_to="video/", blank=True, null=True, storage=video_storage)
     video_url = models.URLField(blank=True, help_text="Use this OR upload a file above")
     poster_image = models.ImageField(upload_to="video/", blank=True, null=True)
 
