@@ -29,7 +29,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Render (and similar PaaS) terminate TLS at a proxy and forward plain HTTP
 # internally; without this Django thinks every request is insecure and the
 # admin login's CSRF/secure-cookie checks fail behind HTTPS.
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")    
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -108,7 +108,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -124,6 +123,17 @@ if FRONTEND_DIST.exists():
     WHITENOISE_ROOT = FRONTEND_DIST
 
 # ---------------------------------------------------------------------------
+# Storage backends - Django 5.2's STORAGES setting, not the legacy
+# DEFAULT_FILE_STORAGE/STATICFILES_STORAGE strings (Django does not
+# reliably auto-convert those into STORAGES, which silently left every
+# upload on local disk even with Cloudinary configured).
+# ---------------------------------------------------------------------------
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+# ---------------------------------------------------------------------------
 # Cloudinary - only switched on when credentials are actually provided, so
 # local development without Cloudinary keys still works (falls back to disk).
 # ---------------------------------------------------------------------------
@@ -137,7 +147,7 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         "API_KEY": CLOUDINARY_API_KEY,
         "API_SECRET": CLOUDINARY_API_SECRET,
     }
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
