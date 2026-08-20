@@ -23,6 +23,14 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.
 if DEBUG and "*" not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append("*")
 
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()
+]
+# Render (and similar PaaS) terminate TLS at a proxy and forward plain HTTP
+# internally; without this Django thinks every request is insecure and the
+# admin login's CSRF/secure-cookie checks fail behind HTTPS.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")    
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -98,12 +106,22 @@ TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# ---------------------------------------------------------------------------
+# Built React app (frontend/dist) - served by this same Django process via
+# WhiteNoise so the site and API live behind a single URL/port. Only kicks
+# in when the frontend has actually been built (e.g. inside the Docker
+# image); local `npm run dev` still uses Vite directly on its own port.
+# ---------------------------------------------------------------------------
+FRONTEND_DIST = BASE_DIR.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    WHITENOISE_ROOT = FRONTEND_DIST
 
 # ---------------------------------------------------------------------------
 # Cloudinary - only switched on when credentials are actually provided, so
