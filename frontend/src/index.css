@@ -27,17 +27,17 @@ body {
   border-radius: 999px;
 }
 
+p {
+  font-weight: 500;
+}
+
 @layer utilities {
   .font-display {
     font-family: "Cormorant Garamond", serif;
+    font-weight: 700;
   }
   .text-gradient-gold {
-    background: linear-gradient(90deg, #c8a66a, #e7ddce, #c8a66a);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: gradient-move 6s ease infinite;
+    color: #c8a66a;
   }
   .glass {
     background: rgba(247, 243, 234, 0.08);
