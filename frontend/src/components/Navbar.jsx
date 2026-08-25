@@ -13,7 +13,7 @@ const LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-export function Navbar({ siteName }) {
+export function Navbar({ siteName, logo }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { scrollY } = useScroll();
@@ -30,7 +30,8 @@ export function Navbar({ siteName }) {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
-        <a href="#home" className={`font-display text-2xl tracking-wide ${scrolled ? "text-forest" : "text-cream"}`}>
+        <a href="#home" className={`flex items-center gap-3 font-display text-2xl tracking-wide ${scrolled ? "text-forest" : "text-cream"}`}>
+          {logo && <img src={logo} alt={siteName} className="h-9 w-9 rounded-full object-cover" />}
           {siteName}
         </a>
 

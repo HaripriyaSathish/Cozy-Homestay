@@ -37,7 +37,7 @@ export default function App() {
   return (
     <>
       <LoadingScreen visible={showLoader} siteName={content.settings.site_name} />
-      <Navbar siteName={content.settings.site_name} />
+      <Navbar siteName={content.settings.site_name} logo={content.settings.logo} />
       <main>
         <Hero hero={content.hero} contact={content.contact} />
         <Welcome property={content.property} />

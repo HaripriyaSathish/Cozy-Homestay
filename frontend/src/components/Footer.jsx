@@ -30,7 +30,10 @@ export function Footer({ settings, contact, social }) {
     <footer className="bg-charcoal py-16 text-cream/70">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-2xl text-cream">{settings.site_name}</p>
+          <p className="flex items-center gap-3 font-display text-2xl text-cream">
+            {settings.logo && <img src={settings.logo} alt={settings.site_name} className="h-10 w-10 rounded-full object-cover" />}
+            {settings.site_name}
+          </p>
           <p className="mt-4 text-sm leading-relaxed">
             A boutique homestay built around peaceful stays, personal hospitality and a genuine sense of place.
           </p>
